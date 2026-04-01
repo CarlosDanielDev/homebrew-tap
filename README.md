@@ -6,14 +6,16 @@ Multi-session Claude Code orchestrator with Matrix-style TUI.
 
 ```bash
 brew tap CarlosDanielDev/tap
-brew install maestro
+brew install carlosdanieldev/tap/maestro --formula
 ```
+
+> **Note:** The `--formula` flag is required because an unrelated cask named "maestro" exists in Homebrew core.
 
 ## Update
 
 ```bash
 brew update
-brew upgrade maestro
+brew upgrade carlosdanieldev/tap/maestro
 ```
 
 ## More info
