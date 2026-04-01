@@ -1,0 +1,81 @@
+name: Update Formula
+
+on:
+  repository_dispatch:
+    types: [formula-update]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Update maestro formula
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.event.client_payload.version }}
+      TAG: ${{ github.event.client_payload.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release assets and update formula
+        run: |
+          REPO="CarlosDanielDev/maestro"
+          BASE_URL="https://github.com/${REPO}/releases/download/${TAG}"
+
+          # Download tarballs to compute sha256
+          for target in aarch64-apple-darwin x86_64-apple-darwin x86_64-unknown-linux-gnu; do
+            FILE="maestro-${TAG}-${target}.tar.gz"
+            curl -sL --retry 3 -o "${FILE}" "${BASE_URL}/${FILE}"
+          done
+
+          SHA_AARCH64=$(sha256sum "maestro-${TAG}-aarch64-apple-darwin.tar.gz" | awk '{print $1}')
+          SHA_X86_64_MAC=$(sha256sum "maestro-${TAG}-x86_64-apple-darwin.tar.gz" | awk '{print $1}')
+          SHA_LINUX=$(sha256sum "maestro-${TAG}-x86_64-unknown-linux-gnu.tar.gz" | awk '{print $1}')
+
+          echo "aarch64-apple-darwin: ${SHA_AARCH64}"
+          echo "x86_64-apple-darwin:  ${SHA_X86_64_MAC}"
+          echo "x86_64-linux:         ${SHA_LINUX}"
+
+          cat > Formula/maestro.rb << EOF
+          class Maestro < Formula
+            desc "Multi-session Claude Code orchestrator with Matrix-style TUI"
+            homepage "https://github.com/CarlosDanielDev/maestro"
+            license "MIT"
+            version "${VERSION}"
+
+            on_macos do
+              if Hardware::CPU.arm?
+                url "${BASE_URL}/maestro-${TAG}-aarch64-apple-darwin.tar.gz"
+                sha256 "${SHA_AARCH64}"
+              else
+                url "${BASE_URL}/maestro-${TAG}-x86_64-apple-darwin.tar.gz"
+                sha256 "${SHA_X86_64_MAC}"
+              end
+            end
+
+            on_linux do
+              url "${BASE_URL}/maestro-${TAG}-x86_64-unknown-linux-gnu.tar.gz"
+              sha256 "${SHA_LINUX}"
+            end
+
+            def install
+              bin.install "maestro"
+            end
+
+            test do
+              assert_match "maestro", shell_output("#{bin}/maestro --help")
+            end
+          end
+          EOF
+
+          # Remove heredoc indentation (10 spaces)
+          sed -i 's/^          //' Formula/maestro.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/maestro.rb
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "feat: update maestro to ${VERSION}"
+          git push
