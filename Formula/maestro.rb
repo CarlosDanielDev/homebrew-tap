@@ -2,21 +2,21 @@ class Maestro < Formula
   desc "Multi-session Claude Code orchestrator with Matrix-style TUI"
   homepage "https://github.com/CarlosDanielDev/maestro"
   license "MIT"
-  version "0.24.0"
+  version "0.24.1"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.0/maestro-v0.24.0-aarch64-apple-darwin.tar.gz"
-      sha256 "5cacf0ab70bf78fa67d7a514aa7b1cc115c10c94ccb4e3f9ba07e4174751fc6e"
+      url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.1/maestro-v0.24.1-aarch64-apple-darwin.tar.gz"
+      sha256 "ccff19a87b0545390e9e256d2d722f1ceb484a54e75bff4477621b41a9442a94"
     else
-      url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.0/maestro-v0.24.0-x86_64-apple-darwin.tar.gz"
-      sha256 "38dfb53a9150839717f4e2f520159200a1083c36b9f3e884df23e8368194e173"
+      url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.1/maestro-v0.24.1-x86_64-apple-darwin.tar.gz"
+      sha256 "dd2ec7d9de470404d4345f560ce92e528f9bf990b30ba445b2668ec9569e7bcc"
     end
   end
 
   on_linux do
-    url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.0/maestro-v0.24.0-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 "3d0954eb910542427259068f3964d1ab35e3847a8968cc7b4d73c6ae0c21d522"
+    url "https://github.com/CarlosDanielDev/maestro/releases/download/v0.24.1/maestro-v0.24.1-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 "481071fbf963859aa9d0a1077b017cf78097792a911f4e7584b8f1e9a64460f0"
   end
 
   def install
